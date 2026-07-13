@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import * as db from "@/lib/db";
-import { StatusBadge } from "@/components/status-badge";
-import { NewSectionForm } from "./new-section-form";
+import { AddSectionButton } from "./add-section-button";
 
 export default async function ChapterPage({
   params,
@@ -24,24 +23,22 @@ export default async function ChapterPage({
         <h1 className="text-2xl font-semibold tracking-tight mt-1">{chapter.title}</h1>
       </div>
 
-      <NewSectionForm chapterId={chapterId} />
+      <AddSectionButton chapterId={chapterId} />
 
       <ul className="divide-y divide-zinc-200 dark:divide-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         {sections.map((section) => (
-          <li key={section.id} className="px-4 py-3 flex items-center justify-between">
+          <li key={section.id} className="px-4 py-3">
             <Link
               href={`/chapters/${chapterId}/sections/${section.id}`}
               className="font-medium hover:underline"
             >
-              {section.title}
+              Section {section.order}
             </Link>
-            <StatusBadge status={section.status} />
           </li>
         ))}
         {sections.length === 0 && (
           <li className="px-4 py-6 text-sm text-zinc-500">
-            No sections yet. Add the first section above — a section is whatever
-            chunk of reading you decide to fully process before moving on.
+            No sections yet — add the first one above.
           </li>
         )}
       </ul>

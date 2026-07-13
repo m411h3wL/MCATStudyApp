@@ -1,13 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type {
-  Chapter,
-  Section,
-  Question,
-  BrainstormItem,
-  Flashcard,
-  AnswerStyle,
-} from "./types";
+import type { Chapter, Section, QuestionDoc, AnswerStyle } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -25,21 +18,6 @@ async function writeJson<T>(relPath: string, data: T): Promise<void> {
   const full = path.join(DATA_DIR, relPath);
   await fs.mkdir(path.dirname(full), { recursive: true });
   await fs.writeFile(full, JSON.stringify(data, null, 2) + "\n", "utf-8");
-}
-
-async function readText(relPath: string, fallback: string): Promise<string> {
-  try {
-    return await fs.readFile(path.join(DATA_DIR, relPath), "utf-8");
-  } catch (err: unknown) {
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") return fallback;
-    throw err;
-  }
-}
-
-async function writeText(relPath: string, content: string): Promise<void> {
-  const full = path.join(DATA_DIR, relPath);
-  await fs.mkdir(path.dirname(full), { recursive: true });
-  await fs.writeFile(full, content, "utf-8");
 }
 
 // Chapters
@@ -79,50 +57,17 @@ export async function getSectionsByChapter(chapterId: string): Promise<Section[]
     .sort((a, b) => a.order - b.order);
 }
 
-// Notes (markdown, one file per section)
+// Question docs (one JSON file per section, holding all its rounds)
 
-export async function getNotes(sectionId: string): Promise<string> {
-  return readText(`sections/${sectionId}/notes.md`, "");
+export async function getQuestionDocs(sectionId: string): Promise<QuestionDoc[]> {
+  return readJson<QuestionDoc[]>(`sections/${sectionId}/question-docs.json`, []);
 }
 
-export async function saveNotes(sectionId: string, content: string): Promise<void> {
-  await writeText(`sections/${sectionId}/notes.md`, content);
-}
-
-// Questions
-
-export async function getQuestions(sectionId: string): Promise<Question[]> {
-  return readJson<Question[]>(`sections/${sectionId}/questions.json`, []);
-}
-
-export async function saveQuestions(
+export async function saveQuestionDocs(
   sectionId: string,
-  questions: Question[]
+  docs: QuestionDoc[]
 ): Promise<void> {
-  await writeJson(`sections/${sectionId}/questions.json`, questions);
-}
-
-// Flashcard brainstorm
-
-export async function getBrainstorm(sectionId: string): Promise<BrainstormItem[]> {
-  return readJson<BrainstormItem[]>(`sections/${sectionId}/brainstorm.json`, []);
-}
-
-export async function saveBrainstorm(
-  sectionId: string,
-  items: BrainstormItem[]
-): Promise<void> {
-  await writeJson(`sections/${sectionId}/brainstorm.json`, items);
-}
-
-// Flashcards
-
-export async function getFlashcards(): Promise<Flashcard[]> {
-  return readJson<Flashcard[]>("flashcards.json", []);
-}
-
-export async function saveFlashcards(cards: Flashcard[]): Promise<void> {
-  await writeJson("flashcards.json", cards);
+  await writeJson(`sections/${sectionId}/question-docs.json`, docs);
 }
 
 // Answer styles

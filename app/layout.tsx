@@ -21,8 +21,6 @@ export const metadata: Metadata = {
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
   { href: "/chapters", label: "Chapters" },
-  { href: "/finalize", label: "Finalize" },
-  { href: "/flashcards", label: "Flashcards" },
   { href: "/answer-styles", label: "Answer Styles" },
 ];
 

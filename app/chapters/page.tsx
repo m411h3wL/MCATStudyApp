@@ -20,7 +20,6 @@ export default async function ChaptersPage() {
       <ul className="divide-y divide-zinc-200 dark:divide-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         {sorted.map((chapter) => {
           const chapterSections = sections.filter((s) => s.chapterId === chapter.id);
-          const finalized = chapterSections.filter((s) => s.status === "finalized").length;
           return (
             <li key={chapter.id} className="px-4 py-3 flex items-center justify-between">
               <div>
@@ -28,8 +27,7 @@ export default async function ChaptersPage() {
                   {chapter.title}
                 </Link>
                 <p className="text-xs text-zinc-500">
-                  {chapterSections.length} section{chapterSections.length === 1 ? "" : "s"} ·{" "}
-                  {finalized} finalized
+                  {chapterSections.length} section{chapterSections.length === 1 ? "" : "s"}
                 </p>
               </div>
             </li>

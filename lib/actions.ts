@@ -3,8 +3,7 @@
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import * as db from "./db";
-import { nextSrsState, initialSrs } from "./srs";
-import type { Grade, SectionStatus } from "./types";
+import type { Section } from "./types";
 
 // Chapters
 
@@ -26,202 +25,49 @@ export async function createChapter(formData: FormData) {
 
 // Sections
 
-export async function createSection(chapterId: string, formData: FormData) {
-  const title = String(formData.get("title") || "").trim();
-  if (!title) return;
-
+export async function createSection(chapterId: string): Promise<Section> {
   const sections = await db.getSections();
   const existingInChapter = sections.filter((s) => s.chapterId === chapterId);
-  const section = {
+  const section: Section = {
     id: randomUUID(),
     chapterId,
-    title,
     order: existingInChapter.length,
-    status: "reading" as SectionStatus,
     createdAt: new Date().toISOString(),
   };
   await db.saveSections([...sections, section]);
   revalidatePath(`/chapters/${chapterId}`);
   revalidatePath("/");
+  return section;
 }
 
-export async function setSectionStatus(sectionId: string, status: SectionStatus) {
-  const sections = await db.getSections();
-  const section = sections.find((s) => s.id === sectionId);
-  if (!section) return;
-  section.status = status;
-  await db.saveSections(sections);
-  revalidatePath(`/chapters/${section.chapterId}/sections/${sectionId}`);
-  revalidatePath(`/chapters/${section.chapterId}`);
-  revalidatePath("/finalize");
-  revalidatePath("/");
+// Question docs
+
+export async function createQuestionDoc(chapterId: string, sectionId: string) {
+  const docs = await db.getQuestionDocs(sectionId);
+  const doc = {
+    id: randomUUID(),
+    sectionId,
+    index: docs.length + 1,
+    content: "",
+    createdAt: new Date().toISOString(),
+  };
+  await db.saveQuestionDocs(sectionId, [...docs, doc]);
+  revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
+  return doc;
 }
 
-// Notes
-
-export async function saveSectionNotes(
+export async function saveQuestionDocContent(
   chapterId: string,
   sectionId: string,
+  docId: string,
   content: string
 ) {
-  await db.saveNotes(sectionId, content);
+  const docs = await db.getQuestionDocs(sectionId);
+  const doc = docs.find((d) => d.id === docId);
+  if (!doc) return;
+  doc.content = content;
+  await db.saveQuestionDocs(sectionId, docs);
   revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
-}
-
-// Questions
-
-export async function addQuestion(
-  chapterId: string,
-  sectionId: string,
-  round: number,
-  formData: FormData
-) {
-  const text = String(formData.get("text") || "").trim();
-  if (!text) return;
-
-  const questions = await db.getQuestions(sectionId);
-  questions.push({
-    id: randomUUID(),
-    sectionId,
-    round,
-    text,
-    createdAt: new Date().toISOString(),
-  });
-  await db.saveQuestions(sectionId, questions);
-  revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
-}
-
-export async function setQuestionAnswerStyle(
-  chapterId: string,
-  sectionId: string,
-  questionId: string,
-  answerStyleId: string
-) {
-  const questions = await db.getQuestions(sectionId);
-  const q = questions.find((q) => q.id === questionId);
-  if (!q) return;
-  q.answerStyleId = answerStyleId;
-  await db.saveQuestions(sectionId, questions);
-  revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
-}
-
-export async function saveQuestionAnswer(
-  chapterId: string,
-  sectionId: string,
-  questionId: string,
-  answer: string
-) {
-  const questions = await db.getQuestions(sectionId);
-  const q = questions.find((q) => q.id === questionId);
-  if (!q) return;
-  q.answer = answer;
-  q.answeredAt = new Date().toISOString();
-  await db.saveQuestions(sectionId, questions);
-  revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
-}
-
-export async function startNextRound(chapterId: string, sectionId: string) {
-  revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
-}
-
-// Flashcard brainstorm
-
-export async function addBrainstormItem(
-  chapterId: string,
-  sectionId: string,
-  formData: FormData
-) {
-  const front = String(formData.get("front") || "").trim();
-  const back = String(formData.get("back") || "").trim();
-  if (!front || !back) return;
-
-  const items = await db.getBrainstorm(sectionId);
-  items.push({
-    id: randomUUID(),
-    sectionId,
-    front,
-    back,
-    createdAt: new Date().toISOString(),
-  });
-  await db.saveBrainstorm(sectionId, items);
-  revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
-}
-
-export async function deleteBrainstormItem(
-  chapterId: string,
-  sectionId: string,
-  itemId: string
-) {
-  const items = await db.getBrainstorm(sectionId);
-  await db.saveBrainstorm(
-    sectionId,
-    items.filter((i) => i.id !== itemId)
-  );
-  revalidatePath(`/chapters/${chapterId}/sections/${sectionId}`);
-  revalidatePath("/finalize");
-}
-
-// Finalization: turn brainstorm items from a batch of "ready" sections into real flashcards
-
-export async function finalizeSections(sectionIds: string[], keepItemIds: string[]) {
-  if (sectionIds.length === 0) return;
-
-  const sections = await db.getSections();
-  const keepSet = new Set(keepItemIds);
-  const flashcards = await db.getFlashcards();
-
-  for (const sectionId of sectionIds) {
-    const section = sections.find((s) => s.id === sectionId);
-    if (!section) continue;
-
-    const brainstorm = await db.getBrainstorm(sectionId);
-    for (const item of brainstorm) {
-      if (!keepSet.has(item.id)) continue;
-      flashcards.push({
-        id: randomUUID(),
-        front: item.front,
-        back: item.back,
-        chapterId: section.chapterId,
-        sectionId: section.id,
-        createdAt: new Date().toISOString(),
-        srs: initialSrs(),
-      });
-    }
-
-    section.status = "finalized";
-  }
-
-  await db.saveFlashcards(flashcards);
-  await db.saveSections(sections);
-
-  revalidatePath("/finalize");
-  revalidatePath("/flashcards");
-  revalidatePath("/");
-  for (const sectionId of sectionIds) {
-    const section = sections.find((s) => s.id === sectionId);
-    if (section) {
-      revalidatePath(`/chapters/${section.chapterId}/sections/${sectionId}`);
-      revalidatePath(`/chapters/${section.chapterId}`);
-    }
-  }
-}
-
-// Flashcard review (SRS)
-
-export async function reviewFlashcard(flashcardId: string, grade: Grade) {
-  const cards = await db.getFlashcards();
-  const card = cards.find((c) => c.id === flashcardId);
-  if (!card) return;
-  card.srs = nextSrsState(card.srs, grade);
-  await db.saveFlashcards(cards);
-  revalidatePath("/flashcards");
-  revalidatePath("/flashcards/review");
-}
-
-export async function deleteFlashcard(flashcardId: string) {
-  const cards = await db.getFlashcards();
-  await db.saveFlashcards(cards.filter((c) => c.id !== flashcardId));
-  revalidatePath("/flashcards");
 }
 
 // Answer styles
