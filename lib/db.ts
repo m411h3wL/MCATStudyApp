@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type { Chapter, Section, QuestionDoc, AnswerStyle } from "./types";
+import type { Section, QuestionDoc } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -20,21 +20,6 @@ async function writeJson<T>(relPath: string, data: T): Promise<void> {
   await fs.writeFile(full, JSON.stringify(data, null, 2) + "\n", "utf-8");
 }
 
-// Chapters
-
-export async function getChapters(): Promise<Chapter[]> {
-  return readJson<Chapter[]>("chapters.json", []);
-}
-
-export async function saveChapters(chapters: Chapter[]): Promise<void> {
-  await writeJson("chapters.json", chapters);
-}
-
-export async function getChapter(chapterId: string): Promise<Chapter | undefined> {
-  const chapters = await getChapters();
-  return chapters.find((c) => c.id === chapterId);
-}
-
 // Sections
 
 export async function getSections(): Promise<Section[]> {
@@ -50,13 +35,6 @@ export async function getSection(sectionId: string): Promise<Section | undefined
   return sections.find((s) => s.id === sectionId);
 }
 
-export async function getSectionsByChapter(chapterId: string): Promise<Section[]> {
-  const sections = await getSections();
-  return sections
-    .filter((s) => s.chapterId === chapterId)
-    .sort((a, b) => a.order - b.order);
-}
-
 // Question docs (one JSON file per section, holding all its rounds)
 
 export async function getQuestionDocs(sectionId: string): Promise<QuestionDoc[]> {
@@ -68,14 +46,4 @@ export async function saveQuestionDocs(
   docs: QuestionDoc[]
 ): Promise<void> {
   await writeJson(`sections/${sectionId}/question-docs.json`, docs);
-}
-
-// Answer styles
-
-export async function getAnswerStyles(): Promise<AnswerStyle[]> {
-  return readJson<AnswerStyle[]>("answer-styles.json", []);
-}
-
-export async function saveAnswerStyles(styles: AnswerStyle[]): Promise<void> {
-  await writeJson("answer-styles.json", styles);
 }

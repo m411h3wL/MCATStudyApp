@@ -8,30 +8,31 @@ import { SectionNav } from "./section-nav";
 export default async function SectionPage({
   params,
 }: {
-  params: Promise<{ chapterId: string; sectionId: string }>;
+  params: Promise<{ sectionId: string }>;
 }) {
-  const { chapterId, sectionId } = await params;
+  const { sectionId } = await params;
 
-  const [chapter, section, chapterSections] = await Promise.all([
-    db.getChapter(chapterId),
+  const [section, allSections] = await Promise.all([
     db.getSection(sectionId),
-    db.getSectionsByChapter(chapterId),
+    db.getSections(),
   ]);
-  if (!chapter || !section || section.chapterId !== chapterId) notFound();
+  if (!section) notFound();
+
+  const sorted = [...allSections].sort((a, b) => a.order - b.order);
+  const prevSection = sorted.find((s) => s.order === section.order - 1);
+  const nextSection = sorted.find((s) => s.order === section.order + 1);
 
   const docs = (await db.getQuestionDocs(sectionId)).sort((a, b) => a.index - b.index);
-
-  const prevSection = chapterSections.find((s) => s.order === section.order - 1);
-  const nextSection = chapterSections.find((s) => s.order === section.order + 1);
 
   return (
     <div className="space-y-6">
       <div>
-        <Link href={`/chapters/${chapterId}`} className="text-sm text-zinc-500 hover:underline">
-          ← {chapter.title}
+        <Link href="/" className="text-sm text-zinc-500 hover:underline">
+          ← Sections
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight mt-1">
           Section {section.order}
+          {section.title ? ` — ${section.title}` : ""}
         </h1>
       </div>
 
@@ -39,10 +40,10 @@ export default async function SectionPage({
         {docs.map((doc) => (
           <QuestionDocEditor
             key={doc.id}
-            chapterId={chapterId}
             sectionId={sectionId}
             sectionOrder={section.order}
             doc={doc}
+            autoFocus={docs.length === 1 && doc.content === ""}
           />
         ))}
         {docs.length === 0 && (
@@ -50,14 +51,10 @@ export default async function SectionPage({
             No question docs yet for this section.
           </p>
         )}
-        <AddQuestionDocButton chapterId={chapterId} sectionId={sectionId} />
+        <AddQuestionDocButton sectionId={sectionId} />
       </div>
 
-      <SectionNav
-        chapterId={chapterId}
-        prevSectionId={prevSection?.id}
-        nextSectionId={nextSection?.id}
-      />
+      <SectionNav prevSectionId={prevSection?.id} nextSectionId={nextSection?.id} />
     </div>
   );
 }

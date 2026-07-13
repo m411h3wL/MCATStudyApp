@@ -5,15 +5,15 @@ import { saveQuestionDocContent } from "@/lib/actions";
 import type { QuestionDoc } from "@/lib/types";
 
 export function QuestionDocEditor({
-  chapterId,
   sectionId,
   sectionOrder,
   doc,
+  autoFocus,
 }: {
-  chapterId: string;
   sectionId: string;
   sectionOrder: number;
   doc: QuestionDoc;
+  autoFocus?: boolean;
 }) {
   const [content, setContent] = useState(doc.content);
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
@@ -30,9 +30,7 @@ export function QuestionDocEditor({
     setStatus("saving");
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      saveQuestionDocContent(chapterId, sectionId, doc.id, newValue).then(() =>
-        setStatus("saved")
-      );
+      saveQuestionDocContent(sectionId, doc.id, newValue).then(() => setStatus("saved"));
     }, 600);
   }
 
@@ -63,6 +61,7 @@ export function QuestionDocEditor({
         value={content}
         onChange={(e) => scheduleSave(e.target.value)}
         onKeyDown={handleKeyDown}
+        autoFocus={autoFocus}
         rows={10}
         placeholder="Type a question, press ? to log it and start the next line..."
         className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm font-mono"

@@ -4,13 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createQuestionDoc } from "@/lib/actions";
 
-export function AddQuestionDocButton({
-  chapterId,
-  sectionId,
-}: {
-  chapterId: string;
-  sectionId: string;
-}) {
+export function AddQuestionDocButton({ sectionId }: { sectionId: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -19,7 +13,7 @@ export function AddQuestionDocButton({
       disabled={isPending}
       onClick={() =>
         startTransition(async () => {
-          await createQuestionDoc(chapterId, sectionId);
+          await createQuestionDoc(sectionId);
           router.refresh();
         })
       }
