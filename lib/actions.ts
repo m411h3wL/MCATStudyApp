@@ -31,6 +31,16 @@ export async function createSection(title?: string): Promise<Section> {
   return section;
 }
 
+export async function renameSection(sectionId: string, title: string) {
+  const sections = await db.getSections();
+  const section = sections.find((s) => s.id === sectionId);
+  if (!section) return;
+  section.title = title.trim() ? title.trim() : undefined;
+  await db.saveSections(sections);
+  revalidatePath("/");
+  revalidatePath(`/sections/${sectionId}`);
+}
+
 export async function createQuestionDoc(sectionId: string) {
   const docs = await db.getQuestionDocs(sectionId);
   const doc = {

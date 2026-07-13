@@ -5,6 +5,7 @@ import { QuestionDocEditor } from "./question-doc-editor";
 import { AddQuestionDocButton } from "./add-question-doc-button";
 import { SectionNav } from "./section-nav";
 import { ImagePasteArea } from "./image-paste-area";
+import { SectionTitle } from "./section-title";
 
 export default async function SectionPage({
   params,
@@ -34,10 +35,7 @@ export default async function SectionPage({
         <Link href="/" className="text-sm text-zinc-500 hover:underline">
           ← Sections
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight mt-1">
-          Section {section.order}
-          {section.title ? ` — ${section.title}` : ""}
-        </h1>
+        <SectionTitle sectionId={sectionId} order={section.order} initialTitle={section.title} />
       </div>
 
       <ImagePasteArea sectionId={sectionId} initialImages={images} />
