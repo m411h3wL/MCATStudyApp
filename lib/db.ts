@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type { Section, QuestionDoc } from "./types";
+import type { Section, QuestionDoc, SectionImage } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -46,4 +46,48 @@ export async function saveQuestionDocs(
   docs: QuestionDoc[]
 ): Promise<void> {
   await writeJson(`sections/${sectionId}/question-docs.json`, docs);
+}
+
+// Images (manifest per section + binary files on disk)
+
+export async function getImages(sectionId: string): Promise<SectionImage[]> {
+  return readJson<SectionImage[]>(`sections/${sectionId}/images.json`, []);
+}
+
+export async function saveImages(
+  sectionId: string,
+  images: SectionImage[]
+): Promise<void> {
+  await writeJson(`sections/${sectionId}/images.json`, images);
+}
+
+function imageFilePath(sectionId: string, imageId: string, ext: string): string {
+  return path.join(DATA_DIR, "sections", sectionId, "images", `${imageId}.${ext}`);
+}
+
+export async function writeImageFile(
+  sectionId: string,
+  imageId: string,
+  ext: string,
+  buffer: Buffer
+): Promise<void> {
+  const full = imageFilePath(sectionId, imageId, ext);
+  await fs.mkdir(path.dirname(full), { recursive: true });
+  await fs.writeFile(full, buffer);
+}
+
+export async function readImageFile(
+  sectionId: string,
+  imageId: string,
+  ext: string
+): Promise<Buffer> {
+  return fs.readFile(imageFilePath(sectionId, imageId, ext));
+}
+
+export async function deleteImageFile(
+  sectionId: string,
+  imageId: string,
+  ext: string
+): Promise<void> {
+  await fs.rm(imageFilePath(sectionId, imageId, ext), { force: true });
 }

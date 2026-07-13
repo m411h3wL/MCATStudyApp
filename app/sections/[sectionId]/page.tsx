@@ -4,6 +4,7 @@ import * as db from "@/lib/db";
 import { QuestionDocEditor } from "./question-doc-editor";
 import { AddQuestionDocButton } from "./add-question-doc-button";
 import { SectionNav } from "./section-nav";
+import { ImagePasteArea } from "./image-paste-area";
 
 export default async function SectionPage({
   params,
@@ -22,7 +23,10 @@ export default async function SectionPage({
   const prevSection = sorted.find((s) => s.order === section.order - 1);
   const nextSection = sorted.find((s) => s.order === section.order + 1);
 
-  const docs = (await db.getQuestionDocs(sectionId)).sort((a, b) => a.index - b.index);
+  const [docs, images] = await Promise.all([
+    db.getQuestionDocs(sectionId).then((d) => d.sort((a, b) => a.index - b.index)),
+    db.getImages(sectionId),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -35,6 +39,8 @@ export default async function SectionPage({
           {section.title ? ` — ${section.title}` : ""}
         </h1>
       </div>
+
+      <ImagePasteArea sectionId={sectionId} initialImages={images} />
 
       <div className="space-y-6">
         {docs.map((doc) => (

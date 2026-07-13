@@ -12,3 +12,10 @@ export type QuestionDoc = {
   content: string;
   createdAt: string;
 };
+
+export type SectionImage = {
+  id: string;
+  sectionId: string;
+  ext: string;
+  createdAt: string;
+};

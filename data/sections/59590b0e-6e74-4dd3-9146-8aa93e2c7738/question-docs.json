@@ -5,5 +5,19 @@
     "index": 1,
     "content": "Difference between endonuclease and exonuclease activity?\nAre MMR enzymes always a part of the DNAP?\nWhen, specifically does it choose to do endonuclease cleaving at the phosphodiesters vs exonuclease single bp?\nHow does UV Light, high energy radition, X-Rays, chemicals get into the body to modify nucleic acids?\nWhat does oxidation, deamination, and alkylation of bases look like?\nHow does the base excision repair system rank?\nWhy is it called DNA glycosylase enzyme?\nSo you can divide the specific DNA repair pathways based on if damage was done to the double helix or not?\nSo the order is recognizing non double helix affected nucleotide damage, then a glycosylase will excise, then a endonuclease will cleave... so does the phosphodiester sugar backbone stay in tact when the glycosylase excises?\nIt seems the standard repair mecahnism once you have a clean slate is to put back on a DNAP and then a DNA ligase to rejoin the strands to seal nicks?\nThis is all in comparison to the nucleotide excision repair system (NER)?\nWhy are thymine dimers bad?\nThat distorts the double helix, thymine dimers?\nSometimes the chromsome itself, which Im not sure how do you define a chromsome?\nAnyway, sometimes the chromosome itself has a double stranded break, what might cause a double stranded break, the same factors as before?\n",
     "createdAt": "2026-07-13T00:00:00.000Z"
+  },
+  {
+    "id": "30268996-9580-4188-a783-42c8d8d3a131",
+    "sectionId": "59590b0e-6e74-4dd3-9146-8aa93e2c7738",
+    "index": 2,
+    "content": "So the exonuclease activity removes from one end, the last base as opposed to endonuclease cuts inside the DNA strand, like a Restriction enzyme?\nDoesn't DNA get synthesized 5' to 3', if so why is DNA polymerase's exonuclease activity opposing it, is it because it's reading at the end of the 5' to 3' strand which is 3', can't you just say that?\nAh I see so endo means interior and exo means exit from the end?\nSo MMR only happens after DNAP leaves?\nDO DNAP's have endonuclease activity?\nX-rays are very high energy photons, they can knock electrons off of atoms, can I have a visual example of this to store?\nHow do cigarette smoke and chemotherapy drugs contribute to DNA damage?Explain how breathing oxygen slowly damages DNA?\nOxidation is when Oxygen attacks bases, like nucleotide bases, can you show a visual of that?\nDeamination is when you remove an amino group from a base like Cytosine which then becomes Uracil. Can you provide an image for that?\nShow what a carbon-containing group being added on as in Alkylation means in an image?\nNow take those past 4 questions and generate one image for it all?\nSo it goes BER and then NER?\nWhat does AP mean for endonuclease? Does it mean apurinic or without purine or apyrimidic without pyridimine?\nGlycosylase breaks the glycosidic bond, can you break down the word as to know why an ase breaks something, give another example?\nAlso I need an image for glyosylase, since it breaks at the sugar base junction?\nShow the image of a thymine dimer? What amino acid causes kinks again, is it proline? maybe compare that?\n\n\n",
+    "createdAt": "2026-07-13T22:02:50.814Z"
+  },
+  {
+    "id": "3e57e71d-46d2-44aa-8631-f1447a561363",
+    "sectionId": "59590b0e-6e74-4dd3-9146-8aa93e2c7738",
+    "index": 3,
+    "content": "What does endocytosis mean?\nWhat is a DNA adduct?\nWhat is benzo[a]pyrene?\nSome chemotherapy drugs are topioisomerase inhibitors? Explain this to me with an example.\nExpand more on ROS and I need an image for it. I know some examples are O2*, OH*, H2O2?\nWhat does lesion mean?\nDoes 8-oxoG change Guanine to look like a different base?\nHelp me remember the Deamination image? Make it basic and memorable?\n\n",
+    "createdAt": "2026-07-13T22:14:13.789Z"
   }
 ]
