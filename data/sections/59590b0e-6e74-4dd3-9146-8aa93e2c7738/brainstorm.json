@@ -1,0 +1,9 @@
+[
+  {
+    "id": "b9e0e129-9c34-40cb-bf8b-42ad8d23293f",
+    "sectionId": "59590b0e-6e74-4dd3-9146-8aa93e2c7738",
+    "front": "What does Km represent?",
+    "back": "The substrate concentration at which reaction velocity is half of Vmax; a proxy for enzyme-substrate affinity (lower Km = higher affinity).",
+    "createdAt": "2026-07-13T00:10:00.000Z"
+  }
+]
